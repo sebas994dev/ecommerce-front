@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  padding: 0.5rem;
+  border-radius: 9999px;
+}
+.swiper-pagination-bullet {
+  background-color: white;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: white !important;
+  opacity: 1;
+}
