@@ -1,13 +1,13 @@
 import React from 'react';
 
 const categorias = [
-  { nombre: 'Nueva electrónica', imagen: '/images/electronica.webp' },
-  { nombre: 'Coleccionables', imagen: '/images/coleccionables.webp' },
-  { nombre: 'Partes y accesorios', imagen: '/images/partes.webp' },
-  { nombre: 'Moda', imagen: '/images/moda.webp' },
-  { nombre: 'Salud y belleza', imagen: '/images/belleza.webp' },
-  { nombre: 'Hogar y jardín', imagen: '/images/hogar.webp' },
-  { nombre: 'Reacondicionados', imagen: '/images/reacondicionados.webp' },
+  { nombre: 'Electrodomésticos', imagen: 'https://www.electronow.es/blog/wp-content/uploads/2023/04/Que-electrodomesticos-desgastan-mas-rapido-su-eficiencia.png' },
+  { nombre: 'Coleccionables', imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn_rg9ke6gjXavw78hBDvXcPavyfd7YkwXCw&s' },
+  { nombre: 'Partes y accesorios', imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOMR3Ju3SHOpEM4vkFxLOB0zZkDCHRJKo2UA&s' },
+  { nombre: 'Moda', imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTP8w2JeKkgzhSbF7BCAVGcCjfEkDlI9XhA5A&s' },
+  { nombre: 'Salud y belleza', imagen: 'https://images.contentstack.io/v3/assets/bltf4ed0b9a176c126e/bltffdde09b545aecc9/661d8ff836c04a5276cf9bb2/150424-cyber-filtro-topper-labios.jpg?v1752165641444' },
+  { nombre: 'Hogar y jardín', imagen: 'https://www.jardinerosenlima.com/wp-content/uploads/2024/07/planta-hawaina-con-maceta-capsula-v3-300x300.png' },
+  { nombre: 'Dispositovos Electronicos', imagen: 'https://estilospe.vtexassets.com/arquivos/ids/3275227/SKU.jpg?v=638672188231430000' },
 ];
 
 const CategoriasDestacadas = () => {
@@ -29,7 +29,7 @@ const CategoriasDestacadas = () => {
               <img
                 src={cat.imagen}
                 alt={cat.nombre}
-                className="w-20 h-20 object-contain"
+                className="w-28 h-28 object-contain"
               />
             </div>
             <span className="mt-3 text-sm font-semibold text-center text-gray-800">
