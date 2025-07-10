@@ -44,11 +44,11 @@ const Header = () => {
 
         {/* Íconos */}
         <div className="flex items-center gap-4">
-          <Heart className="text-gray-600 hover:text-red-500 cursor-pointer w-5 h-5" />
+          <Heart className="text-gray-600 hover:text-red-500 cursor-pointer w-8 h-8" />
           <div className="relative cursor-pointer">
 
             {/* bUTTON caRRITO */}              
-            <ShoppingCart className="text-gray-600 hover:text-blue-500 w-5 h-5" />
+            <ShoppingCart className="text-gray-600 hover:text-blue-500 w-8 h-8" />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
                 {cartCount}
@@ -56,7 +56,7 @@ const Header = () => {
             )}
           </div>
           
-          <User className="text-gray-600 hover:text-blue-500 cursor-pointer w-5 h-5" />
+          <User className="text-gray-600 hover:text-blue-500 cursor-pointer w-8 h-8" />
           <select className="text-sm bg-transparent border-none text-gray-600 focus:outline-none">
             <option value="es">ES</option>
             <option value="en">EN</option>
