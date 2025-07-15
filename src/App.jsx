@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Favorites from './pages/Favorites'
 import ProductDetail from './pages/ProductDetail'
 import Footer from './components/Footer'
+import CategoryPage from './pages/CategoryPage'
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/carrito" element={<Cart />} />
         <Route path="/favoritos" element={<Favorites />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
+        <Route path="/categoria/:idCategoria" element={<CategoryPage />} />
         <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
       </Routes>
       <Footer />
