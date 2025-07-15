@@ -15,3 +15,8 @@
   background-color: white !important;
   opacity: 1;
 }
+
+.ofertas-swiper .swiper-button-next,
+.ofertas-swiper .swiper-button-prev {
+  color: #01193d !important; /* azul oscuro */
+}
