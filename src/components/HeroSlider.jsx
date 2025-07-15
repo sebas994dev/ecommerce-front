@@ -18,9 +18,9 @@ const slides = [
     buttonHover: 'hover:bg-[#402003]',
     buttonTextColor: 'text-white',
     items: [
-      { image: '/images/lego.webp', label: 'Lego' },
-      { image: '/images/monedas.webp', label: 'Monedas' },
-      { image: '/images/comics.webp', label: 'Cómics' },
+      { image: '/images/banner/lego.webp', label: 'Lego' },
+      { image: '/images/banner/monedas.webp', label: 'Monedas' },
+      { image: '/images/banner/comics.webp', label: 'Cómics' },
     ],
   },
   {
@@ -33,9 +33,9 @@ const slides = [
     buttonHover: 'hover:bg-yellow-600',
     buttonTextColor: 'text-white',
     items: [
-      { image: '/images/sofa.webp', label: 'Sofás' },
-      { image: '/images/zapatilla.webp', label: 'Zapatillas' },
-      { image: '/images/taladro.webp', label: 'Taladros' },
+      { image: '/images/banner/sofa.webp', label: 'Sofás' },
+      { image: '/images/banner/zapatilla.webp', label: 'Zapatillas' },
+      { image: '/images/banner/taladro.webp', label: 'Taladros' },
     ],
   },
   {
@@ -48,9 +48,9 @@ const slides = [
     buttonHover: 'hover:bg-blue-700',
     buttonTextColor: 'text-[#191919]',
     items: [
-      { image: '/images/lampara.webp', label: 'Lámparas' },
-      { image: '/images/camara.webp', label: 'Cámaras' },
-      { image: '/images/enchufe.webp', label: 'Enchufes' },
+      { image: '/images/banner/lampara.webp', label: 'Lámparas' },
+      { image: '/images/banner/camara.webp', label: 'Cámaras' },
+      { image: '/images/banner/enchufe.webp', label: 'Enchufes' },
     ],
   },
 ];
