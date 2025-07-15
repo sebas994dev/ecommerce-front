@@ -84,8 +84,15 @@ const Header = () => {
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <User className="text-blue-600 w-5 h-5" />
+                {user.tipo === 'admin' ? (
+                  <Shield className="text-red-600 w-5 h-5" />
+                ) : (
+                  <User className="text-blue-600 w-5 h-5" />
+                )}
                 <span className="text-sm font-medium">{user.nombre}</span>
+                {user.tipo === 'admin' && (
+                  <span className="text-xs text-red-500 font-medium">Administrador</span>
+                )}
                 <button onClick={handleLogout}>
                   <LogOut className="text-gray-600 hover:text-red-500 w-5 h-5" />
                 </button>
@@ -119,9 +126,8 @@ const Header = () => {
             <a
               key={label}
               href={href}
-              className={`hover:text-red-500 transition ${
-                destacado ? 'text-red-500 font-semibold' : 'text-gray-700'
-              }`}
+              className={`hover:text-red-500 transition ${destacado ? 'text-red-500 font-semibold' : 'text-gray-700'
+                }`}
             >
               {label}
             </a>

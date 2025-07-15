@@ -1,10 +1,10 @@
-// src/components/LoginModal.jsx
 import { useState } from "react";
-import { X, Mail, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
-import { login, register } from "../services/authService";
+import { X, Mail, Lock, Eye, EyeOff, CheckCircle, AlertCircle, User, Shield } from "lucide-react";
+import { login, loginAdmin, register } from "../services/authService";
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [loginType, setLoginType] = useState("user");
   const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "", name: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +15,10 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (message) {
+      setMessage("");
+      setMessageType("");
+    }
   };
 
   const validate = () => {
@@ -44,7 +48,10 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     setIsLoading(true);
     try {
       if (isLogin) {
-        const user = await login(formData.email, formData.password);
+        const user = loginType === "admin"
+          ? await loginAdmin(formData.email, formData.password)
+          : await login(formData.email, formData.password);
+
         setMessage("¡Inicio de sesión exitoso!"); setMessageType("success");
         localStorage.setItem("user", JSON.stringify(user));
         setTimeout(() => { onLoginSuccess(user); onClose(); }, 1200);
@@ -60,6 +67,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     }
   };
 
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setFormData({ email: "", password: "", confirmPassword: "", name: "" });
+    setMessage("");
+    setMessageType("");
+    setLoginType("user");
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
@@ -68,6 +83,35 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
         </button>
 
         <h2 className="text-2xl font-bold mb-4 text-center">{isLogin ? "Iniciar Sesión" : "Crear Cuenta"}</h2>
+
+        {isLogin && (
+          <div className="mb-6 flex gap-2 p-1 bg-gray-100 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setLoginType("user")}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+                loginType === "user"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:text-blue-600"
+              }`}
+              disabled={isLoading}
+            >
+              <User className="w-4 h-4" /> Usuario
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginType("admin")}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+                loginType === "admin"
+                  ? "bg-red-600 text-white"
+                  : "text-gray-600 hover:text-red-600"
+              }`}
+              disabled={isLoading}
+            >
+              <Shield className="w-4 h-4" /> Admin
+            </button>
+          </div>
+        )}
 
         {message && (
           <div className={`mb-4 p-3 rounded-md flex items-center gap-2 text-sm ${
@@ -137,22 +181,36 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            className={`w-full py-2 rounded-md text-white font-medium ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : loginType === "admin"
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            {isLoading ? "Cargando..." : isLogin ? "Iniciar sesión" : "Crear cuenta"}
+            {isLoading
+              ? "Cargando..."
+              : isLogin
+              ? loginType === "admin"
+                ? "Iniciar como Admin"
+                : "Iniciar Sesión"
+              : "Crear cuenta"}
           </button>
         </form>
 
-        <p className="text-sm mt-4 text-center">
-          {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:underline"
-            disabled={isLoading}
-          >
-            {isLogin ? "Crear cuenta" : "Iniciar sesión"}
-          </button>
-        </p>
+        {loginType === "user" && (
+          <p className="text-sm mt-4 text-center">
+            {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
+            <button
+              onClick={toggleMode}
+              className="text-blue-600 hover:underline"
+              disabled={isLoading}
+            >
+              {isLogin ? "Crear cuenta" : "Iniciar sesión"}
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
