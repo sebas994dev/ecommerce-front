@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   ShoppingCart, User, Heart, Menu, X, Search,
-  Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, LogOut
+  Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, LogOut, Shield
 } from 'lucide-react';
 
 const DropdownCategorias = () => (
@@ -18,6 +18,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [loginType, setLoginType] = useState('user'); // 'user' o 'admin'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -67,7 +68,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     return true;
   };
 
-  const handleLogin = async () => {
+  const handleUserLogin = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
@@ -83,9 +84,11 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
       if (response.ok) {
         setMessage('¡Inicio de sesión exitoso!');
         setMessageType('success');
-        localStorage.setItem('user', JSON.stringify(data));
+        // Mantener la estructura original, solo agregar tipo
+        const userData = { ...data, tipo: 'user' };
+        localStorage.setItem('user', JSON.stringify(userData));
         setTimeout(() => {
-          onLoginSuccess(data);
+          onLoginSuccess(userData);
           onClose();
         }, 1500);
       } else {
@@ -94,6 +97,38 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
+      setMessage('Error de conexión');
+      setMessageType('error');
+    }
+  };
+
+  const handleAdminLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          correo: formData.email,
+          contraseña: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('¡Inicio de sesión como administrador exitoso!');
+        setMessageType('success');
+        localStorage.setItem('user', JSON.stringify({ ...data, tipo: 'admin' }));
+        setTimeout(() => {
+          onLoginSuccess({ ...data, tipo: 'admin' });
+          onClose();
+        }, 1500);
+      } else {
+        setMessage(data.message || 'Credenciales de administrador incorrectas');
+        setMessageType('error');
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesión como administrador:', error);
       setMessage('Error de conexión');
       setMessageType('error');
     }
@@ -136,7 +171,11 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     if (!validateForm()) return;
     setIsLoading(true);
     try {
-      isLogin ? await handleLogin() : await handleRegister();
+      if (isLogin) {
+        loginType === 'admin' ? await handleAdminLogin() : await handleUserLogin();
+      } else {
+        await handleRegister();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -145,6 +184,13 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setFormData({ email: '', password: '', confirmPassword: '', name: '' });
+    setMessage('');
+    setMessageType('');
+    setLoginType('user'); // Reset to user login when switching modes
+  };
+
+  const handleLoginTypeChange = (type) => {
+    setLoginType(type);
     setMessage('');
     setMessageType('');
   };
@@ -161,6 +207,38 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
         </h2>
+
+        {/* Login Type Selector - Only show for login */}
+        {isLogin && (
+          <div className="mb-6 flex gap-2 p-1 bg-gray-100 rounded-lg">
+            <button
+              type="button"
+              onClick={() => handleLoginTypeChange('user')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+                loginType === 'user'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
+              disabled={isLoading}
+            >
+              <User className="w-4 h-4" />
+              Usuario
+            </button>
+            <button
+              type="button"
+              onClick={() => handleLoginTypeChange('admin')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
+                loginType === 'admin'
+                  ? 'bg-red-600 text-white'
+                  : 'text-gray-600 hover:text-red-600'
+              }`}
+              disabled={isLoading}
+            >
+              <Shield className="w-4 h-4" />
+              Administrador
+            </button>
+          </div>
+        )}
 
         {message && (
           <div className={`mb-4 p-3 rounded-md flex items-center gap-2 ${
@@ -180,27 +258,33 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
               <input type="text" name="name" value={formData.name} onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Tu nombre completo" required disabled={isLoading} />
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                placeholder="Tu nombre completo" required disabled={isLoading} />
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Correo electrónico {isLogin && loginType === 'admin' && <span className="text-red-500">(Admin)</span>}
+            </label>
             <div className="relative">
               <input type="email" name="email" value={formData.email} onChange={handleInputChange}
-                className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md" placeholder="tu@email.com" required disabled={isLoading} />
+                className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                placeholder="tu@email.com" required disabled={isLoading} />
               <Mail className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Contraseña {isLogin && loginType === 'admin' && <span className="text-red-500">(Admin)</span>}
+            </label>
             <div className="relative">
               <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Tu contraseña" required disabled={isLoading} />
               <Lock className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
               <button type="button" onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-400" disabled={isLoading}>
+                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600" disabled={isLoading}>
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
@@ -208,26 +292,44 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
           {!isLogin && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar contraseña</label>
-              <input type={showPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md"
-                placeholder="Confirma tu contraseña" required disabled={isLoading} />
+              <div className="relative">
+                <input type={showPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Confirma tu contraseña" required disabled={isLoading} />
+                <Lock className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
+              </div>
             </div>
           )}
           <button type="submit" disabled={isLoading}
-            className={`w-full py-2 px-4 rounded-md font-medium ${isLoading ? 'bg-gray-400 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>
-            {isLoading ? (isLogin ? 'Iniciando...' : 'Creando...') : (isLogin ? 'Iniciar Sesión' : 'Crear Cuenta')}
+            className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
+              isLoading 
+                ? 'bg-gray-400 text-white cursor-not-allowed' 
+                : isLogin && loginType === 'admin'
+                ? 'bg-red-600 text-white hover:bg-red-700'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}>
+            {isLoading 
+              ? (isLogin ? 'Iniciando...' : 'Creando...') 
+              : (isLogin 
+                ? (loginType === 'admin' ? 'Iniciar como Admin' : 'Iniciar Sesión')
+                : 'Crear Cuenta'
+              )
+            }
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
-            <button onClick={toggleMode} className="text-blue-600 hover:text-blue-800 ml-1 font-medium" disabled={isLoading}>
-              {isLogin ? 'Crear cuenta' : 'Iniciar sesión'}
-            </button>
-          </p>
-        </div>
+        {/* Only show register toggle for user login */}
+        {loginType === 'user' && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+              <button onClick={toggleMode} className="text-blue-600 hover:text-blue-800 ml-1 font-medium" disabled={isLoading}>
+                {isLogin ? 'Crear cuenta' : 'Iniciar sesión'}
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -240,7 +342,14 @@ const Header = () => {
 
   useEffect(() => {
     const stored = localStorage.getItem('user');
-    if (stored) setUser(JSON.parse(stored));
+    if (stored) {
+      const userData = JSON.parse(stored);
+      // Si no tiene tipo, asumimos que es usuario normal (compatibilidad)
+      if (!userData.tipo) {
+        userData.tipo = 'user';
+      }
+      setUser(userData);
+    }
   }, []);
 
   const handleLoginSuccess = (userData) => {
@@ -260,7 +369,7 @@ const Header = () => {
 
           <div className="hidden md:flex flex-1 mx-8">
             <div className="relative w-full">
-              <input type="text" placeholder="¿Qué buscas?" className="w-full border rounded-full px-4 py-2 pl-10 focus:outline-none" />
+              <input type="text" placeholder="¿Qué buscas?" className="w-full border rounded-full px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               <Search className="absolute left-3 top-2.5 text-gray-500 w-5 h-5" />
             </div>
           </div>
@@ -269,14 +378,23 @@ const Header = () => {
             <Heart className="text-gray-600 hover:text-red-500 cursor-pointer w-8 h-8" />
             <ShoppingCart className="text-gray-600 hover:text-blue-500 cursor-pointer w-8 h-8" />
             {!user ? (
-              <button onClick={() => setShowLoginModal(true)} className="flex items-center gap-2">
+              <button onClick={() => setShowLoginModal(true)} className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md transition-colors">
                 <User className="text-gray-600 hover:text-blue-500 w-8 h-8" />
               </button>
             ) : (
-              <div className="flex items-center gap-2">
-                <User className="text-blue-600 w-8 h-8" />
-                <span className="text-sm font-medium">{user.nombre}</span>
-                <button onClick={handleLogout} className="text-gray-500 hover:text-red-600">
+              <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-md">
+                {user.tipo === 'admin' ? (
+                  <Shield className="text-red-600 w-6 h-6" />
+                ) : (
+                  <User className="text-blue-600 w-6 h-6" />
+                )}
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{user.nombre}</span>
+                  {user.tipo === 'admin' && (
+                    <span className="text-xs text-red-500 font-medium">Administrador</span>
+                  )}
+                </div>
+                <button onClick={handleLogout} className="text-gray-500 hover:text-red-600 ml-2 transition-colors">
                   <LogOut className="w-5 h-5" />
                 </button>
               </div>
