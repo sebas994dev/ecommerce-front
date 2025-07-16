@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  padding: 0.5rem;
+  border-radius: 9999px;
+}
+.swiper-pagination-bullet {
+  background-color: white;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: white !important;
+  opacity: 1;
+}
+
+.ofertas-swiper .swiper-button-next,
+.ofertas-swiper .swiper-button-prev {
+  color: #01193d !important; /* color flecha */
+  width: 30px;               /* ancho del botón */
+  height: 30px;              /* alto del botón */
+}
+
+/* El ícono interno está en el ::after */
+.ofertas-swiper .swiper-button-next::after,
+.ofertas-swiper .swiper-button-prev::after {
+  font-size: 25px; /* tamaño de la flecha interna */
+}
